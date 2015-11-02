@@ -681,66 +681,51 @@ static char UIScrollViewPullToRefreshView;
 }
 
 - (void)drawRect:(CGRect)rect {
-	CGContextRef c = UIGraphicsGetCurrentContext();
-	
-	// the rects above the arrow
-	CGContextAddRect(c, CGRectMake(5, 0, 12, 4)); // to-do: use dynamic points
-	CGContextAddRect(c, CGRectMake(5, 6, 12, 4)); // currently fixed size: 22 x 48pt
-	CGContextAddRect(c, CGRectMake(5, 12, 12, 4));
-	CGContextAddRect(c, CGRectMake(5, 18, 12, 4));
-	CGContextAddRect(c, CGRectMake(5, 24, 12, 4));
-	CGContextAddRect(c, CGRectMake(5, 30, 12, 4));
-	
-	// the arrow
-	CGContextMoveToPoint(c, 0, 34);
-	CGContextAddLineToPoint(c, 11, 48);
-	CGContextAddLineToPoint(c, 22, 34);
-	CGContextAddLineToPoint(c, 0, 34);
-	CGContextClosePath(c);
-	
-	CGContextSaveGState(c);
-	CGContextClip(c);
-	
-	// Gradient Declaration
-	CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-	CGFloat alphaGradientLocations[] = {0, 0.8f};
-    
-	CGGradientRef alphaGradient = nil;
-    if([[[UIDevice currentDevice] systemVersion]floatValue] >= 5){
-        NSArray* alphaGradientColors = [NSArray arrayWithObjects:
-                                        (id)[self.arrowColor colorWithAlphaComponent:0].CGColor,
-                                        (id)[self.arrowColor colorWithAlphaComponent:1].CGColor,
-                                        nil];
-        alphaGradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)alphaGradientColors, alphaGradientLocations);
-    }else{
-        const CGFloat * components = CGColorGetComponents([self.arrowColor CGColor]);
-        size_t numComponents = CGColorGetNumberOfComponents([self.arrowColor CGColor]);
-        CGFloat colors[8];
-        switch(numComponents){
-            case 2:{
-                colors[0] = colors[4] = components[0];
-                colors[1] = colors[5] = components[0];
-                colors[2] = colors[6] = components[0];
-                break;
-            }
-            case 4:{
-                colors[0] = colors[4] = components[0];
-                colors[1] = colors[5] = components[1];
-                colors[2] = colors[6] = components[2];
-                break;
-            }
-        }
-        colors[3] = 0;
-        colors[7] = 1;
-        alphaGradient = CGGradientCreateWithColorComponents(colorSpace,colors,alphaGradientLocations,2);
-    }
-	
-	
-	CGContextDrawLinearGradient(c, alphaGradient, CGPointZero, CGPointMake(0, rect.size.height), 0);
-    
-	CGContextRestoreGState(c);
-	
-	CGGradientRelease(alphaGradient);
-	CGColorSpaceRelease(colorSpace);
+	[self drawWithRect:rect];
 }
+
+- (void)drawWithRect:(CGRect)rect
+{
+    //// General Declarations
+    CGContextRef context = UIGraphicsGetCurrentContext();
+
+    //// Color Declarations
+    UIColor* color = [UIColor colorWithRed: 0.329 green: 0.431 blue: 0.478 alpha: 1];
+
+    //// Bezier 2 Drawing
+    CGContextSaveGState(context);
+    CGContextTranslateCTM(context, CGRectGetMinX(rect) + 24, CGRectGetMinY(rect) + 24);
+    CGContextRotateCTM(context, -90 * M_PI / 180);
+
+    UIBezierPath* bezier2Path = UIBezierPath.bezierPath;
+    [bezier2Path moveToPoint: CGPointMake(0, -7.64)];
+    [bezier2Path addLineToPoint: CGPointMake(0, -3.82)];
+    [bezier2Path addLineToPoint: CGPointMake(5, -8.91)];
+    [bezier2Path addLineToPoint: CGPointMake(0, -14)];
+    [bezier2Path addLineToPoint: CGPointMake(0, -10.18)];
+    [bezier2Path addCurveToPoint: CGPointMake(-10, 0) controlPoint1: CGPointMake(-5.52, -10.18) controlPoint2: CGPointMake(-10, -5.63)];
+    [bezier2Path addCurveToPoint: CGPointMake(-8.45, 5.42) controlPoint1: CGPointMake(-10, 2) controlPoint2: CGPointMake(-9.42, 3.86)];
+    [bezier2Path addLineToPoint: CGPointMake(-6.63, 3.56)];
+    [bezier2Path addCurveToPoint: CGPointMake(-7.5, 0) controlPoint1: CGPointMake(-7.19, 2.51) controlPoint2: CGPointMake(-7.5, 1.29)];
+    [bezier2Path addCurveToPoint: CGPointMake(0, -7.64) controlPoint1: CGPointMake(-7.5, -4.21) controlPoint2: CGPointMake(-4.14, -7.64)];
+    [bezier2Path closePath];
+    [bezier2Path moveToPoint: CGPointMake(8.45, -5.42)];
+    [bezier2Path addLineToPoint: CGPointMake(6.62, -3.56)];
+    [bezier2Path addCurveToPoint: CGPointMake(7.5, 0) controlPoint1: CGPointMake(7.17, -2.49) controlPoint2: CGPointMake(7.5, -1.29)];
+    [bezier2Path addCurveToPoint: CGPointMake(0, 7.64) controlPoint1: CGPointMake(7.5, 4.21) controlPoint2: CGPointMake(4.14, 7.64)];
+    [bezier2Path addLineToPoint: CGPointMake(0, 3.82)];
+    [bezier2Path addLineToPoint: CGPointMake(-5, 8.91)];
+    [bezier2Path addLineToPoint: CGPointMake(0, 14)];
+    [bezier2Path addLineToPoint: CGPointMake(0, 10.18)];
+    [bezier2Path addCurveToPoint: CGPointMake(10, 0) controlPoint1: CGPointMake(5.53, 10.18) controlPoint2: CGPointMake(10, 5.63)];
+    [bezier2Path addCurveToPoint: CGPointMake(8.45, -5.42) controlPoint1: CGPointMake(10, -2) controlPoint2: CGPointMake(9.42, -3.86)];
+    [bezier2Path closePath];
+    bezier2Path.miterLimit = 4;
+
+    [color setFill];
+    [bezier2Path fill];
+
+    CGContextRestoreGState(context);
+}
+
 @end
