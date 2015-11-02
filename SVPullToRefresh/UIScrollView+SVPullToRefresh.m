@@ -442,7 +442,7 @@ static char UIScrollViewPullToRefreshView;
 
 - (SVPullToRefreshArrow *)arrow {
     if(!_arrow) {
-		_arrow = [[SVPullToRefreshArrow alloc]initWithFrame:CGRectMake(0, self.bounds.size.height-54, 22, 48)];
+		_arrow = [[SVPullToRefreshArrow alloc]initWithFrame:CGRectMake(0, self.bounds.size.height-54, 48, 48)];
         _arrow.backgroundColor = [UIColor clearColor];
 		[self addSubview:_arrow];
     }
